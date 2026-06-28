@@ -7,9 +7,6 @@ const generateToken = (id) => {
 
 exports.registerUser = async(req,res) => {
 
-     console.log("Register endpoint hit");
-    console.log("Request body:", req.body);
-
     const { fullName, email, password, profileImageUrl } = req.body;
 
     if(!fullName || !email || !password){
