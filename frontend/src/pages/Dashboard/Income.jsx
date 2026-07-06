@@ -3,6 +3,9 @@ import DashboardLayout from '../../components/layouts/DashboardLayout';
 import IncomeOverview from '../../components/income/IncomeOverview';
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from '../../utils/apiPaths';
+import Model from '../../components/Model';
+import AddIncomeForm from '../../components/income/AddIncomeForm';
+import toast from 'react-hot-toast';
 const Income = () => {
 
   const [incomeData,setIncomeData] = useState([]);
@@ -32,6 +35,40 @@ const Income = () => {
     }
   };
 
+  const handleAddIncome = async (income) => {
+    const {source, amount, date, icon} = income;
+
+    if(!source.trim()){
+      toast.error("Source is required.");
+      return;
+    }
+
+    if(!amount || isNaN(amount) || Number(amount) <= 0){
+      toast.error("Amount should be a valid number greater than 0.");
+      return;
+    }
+
+    if(!date){
+      toast.error("Date is required.");
+      return;
+    }
+
+    try{
+      await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME,{
+        source,
+        amount,
+        date,
+        icon,
+      });
+
+      setopenAddIncomeModel(false);
+      toast.success("Income added successfully.");
+      fetchIncomeDetails();
+    }catch(error){
+      console.error("Error adding income.",error.response?.data?.message || error.message);
+    }
+  }
+
   useEffect(() => {
     fetchIncomeDetails();
 
@@ -45,11 +82,19 @@ const Income = () => {
           <div className=''> 
             <IncomeOverview
                 transactions={incomeData}
-                onAddIncome = {() => setOpenAddIncomeModel(true)}
+                onAddIncome={() => setopenAddIncomeModel(true)}
               />
           </div>
         </div>
       </div>
+
+      <Model
+          isOpen={openAddIncomeModel}
+          onClose={() => setopenAddIncomeModel(false)}
+          title="Add Income"
+        >
+        <AddIncomeForm  onAddIncome={handleAddIncome}/>
+      </Model>
     </DashboardLayout>
   )
 }
