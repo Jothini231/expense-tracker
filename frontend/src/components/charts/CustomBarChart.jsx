@@ -40,7 +40,7 @@ const CustomBarChart = ({data}) => {
 
                 <XAxis dataKey="category" tick={{fontSize: 12, fill: "#555"}} stroke='none' />
                 <YAxis tick={{fontSize: 12, fill: "#555"}} stroke='none' />
-                <Tooltip content={CustomTooltip} />
+                <Tooltip content={<CustomTooltip />} />
 
                 <Bar
                     dataKey="amount"
