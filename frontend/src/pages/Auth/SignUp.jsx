@@ -79,11 +79,13 @@ const SignUp = () => {
 
   return (
     <AuthLayout>
-      <div className="lg:w-[100%] h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center">
-        <h3 className="text-xl font-semibold text-black">Create an Account</h3>
-        <p className="text-xs text-slate-700 mt-[5px] mb-6">
-          Join us today by entering your details below.
-        </p>
+      <div className="flex flex-col justify-center w-full mt-4 md:mt-0">
+        <div className="text-center mb-6">
+          <h3 className="text-3xl font-bold text-gray-800 tracking-tight">Create an Account</h3>
+          <p className="text-sm text-gray-500 mt-2">
+            Join us today by entering your details below.
+          </p>
+        </div>
 
         <form onSubmit={handleSignUp}>
           <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
