@@ -8,7 +8,8 @@ const{
     forgotPassword,
     verifyOTP,
     resetPassword,
-    googleAuth
+    googleAuth,
+    updateProfileImage
 } = require("../controllers/authController");
 const upload = require("../middleware/uploadMiddleware");
 
@@ -22,14 +23,20 @@ router.get("/getUser",protect,getUserInfo);
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", resetPassword);
+router.put("/profile-image", protect, updateProfileImage);
 
-router.post("/upload-image",upload.single("image") , (req, res) =>{
-    if(!req.file){
-        return res.status(400).json({message: "No file uploaded"});
-    }
-
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-    res.status(200).json({imageUrl});
+router.post("/upload-image", (req, res) => {
+    upload.single("image")(req, res, function (err) {
+        if (err) {
+            console.error("Multer/Cloudinary Error:", err);
+            return res.status(500).json({ message: "Upload failed", error: err.message || err });
+        }
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+        const imageUrl = req.file.path;
+        res.status(200).json({ imageUrl });
+    });
 });
 
 module.exports = router;

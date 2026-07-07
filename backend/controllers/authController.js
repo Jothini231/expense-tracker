@@ -236,3 +236,24 @@ exports.googleAuth = async (req, res) => {
         res.status(500).json({ message: "Error authenticating with Google", error: err.message });
     }
 };
+
+exports.updateProfileImage = async (req, res) => {
+    try {
+        const { profileImageUrl } = req.body;
+        if (!profileImageUrl) {
+            return res.status(400).json({ message: "Profile image URL is required" });
+        }
+
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.profileImageUrl = profileImageUrl;
+        await user.save();
+
+        res.status(200).json({ message: "Profile image updated successfully", user });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating profile image", error: error.message });
+    }
+};
