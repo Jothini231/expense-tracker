@@ -3,9 +3,13 @@ import { UserContext } from '../../context/UserContext'
 import { useNavigate } from 'react-router-dom';
 import { SIDE_MENU_DATA } from '../../utils/data';
 import CharAvatar from '../cards/CharAvatar';
+import uploadImage from '../../utils/uploadImage';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
+import toast from 'react-hot-toast';
 
 const SideMenu = ({ activeMenu }) => {
-  const { user, clearUser } = useContext(UserContext);
+  const { user, updateUser, clearUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleClick = (route) => {
@@ -22,28 +26,60 @@ const SideMenu = ({ activeMenu }) => {
     navigate("/login");
   };
 
+  const handleProfileImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const toastId = toast.loading("Updating profile image...");
+      const imgUploadRes = await uploadImage(file);
+      const profileImageUrl = imgUploadRes.imageUrl || "";
+
+      if (profileImageUrl) {
+        const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE_PROFILE_IMAGE, { profileImageUrl });
+        updateUser(response.data.user);
+        toast.success("Profile image updated!", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Failed to update profile image");
+      console.error(error);
+    }
+  };
+
   return (
     <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-100 flex flex-col sticky top-[61px] z-20 shadow-sm'>
 
       {/* User Profile Section */}
       <div className='flex flex-col items-center justify-center gap-3 px-5 py-7 border-b border-gray-100'>
-        <div className='relative'>
+        <label htmlFor="profile-image-upload" className='relative cursor-pointer group'>
           {user?.profileImageUrl ? (
             <img
               src={user.profileImageUrl || ""}
               alt='Profile Image'
-              className='w-16 h-16 rounded-2xl object-cover ring-2 ring-primary/20'
+              className='w-16 h-16 rounded-full object-cover ring-2 ring-primary/20 group-hover:opacity-75 transition-opacity'
             />
           ) : (
-            <CharAvatar
-              fullName={user?.fullName}
-              width="w-16"
-              height="h-16"
-              style="text-lg rounded-2xl ring-2 ring-primary/20"
-            />
+            <div className='group-hover:opacity-75 transition-opacity'>
+              <CharAvatar
+                fullName={user?.fullName}
+                width="w-16"
+                height="h-16"
+                style="text-lg rounded-full ring-2 ring-primary/20"
+              />
+            </div>
           )}
-          <span className='absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full'></span>
-        </div>
+          <span className='absolute bottom-0 right-0 w-4 h-4 bg-green-400 border-2 border-white rounded-full'></span>
+          <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-full transition-opacity'>
+             <span className="text-white text-xs font-medium">Edit</span>
+          </div>
+          <input
+            id="profile-image-upload"
+            type="file"
+            accept="image/png, image/jpeg, image/jpg"
+            className="hidden"
+            onChange={handleProfileImageChange}
+          />
+        </label>
         <div className='text-center'>
           <h5 className='text-sm font-semibold text-gray-800 leading-tight'>
             {user?.fullName || ""}

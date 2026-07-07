@@ -9,6 +9,7 @@ export const API_PATHS = {
         VERIFY_OTP: "/api/v1/auth/verify-otp",
         RESET_PASSWORD: "/api/v1/auth/reset-password",
         GOOGLE_LOGIN: "/api/v1/auth/google",
+        UPDATE_PROFILE_IMAGE: "/api/v1/auth/profile-image",
     },
 
     DASHBOARD: {
