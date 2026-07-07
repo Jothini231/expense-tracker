@@ -5,7 +5,11 @@ const bcrypt = require("bcryptjs");
 const UserSchema = new mongoose.Schema({
     fullName: {type: String, required: true},
     email: {type: String, required:true, unique: true},
-    password: {type: String, required: true},
+    password: {
+        type: String, 
+        required: function() { return this.authProvider === 'local'; }
+    },
+    authProvider: { type: String, default: 'local' },
     profileImageUrl: {type: String, default: null},
     otp: {type: String, default: null},
     otpExpiry: {type: Date, default: null}
@@ -14,7 +18,7 @@ const UserSchema = new mongoose.Schema({
 );
 
 UserSchema.pre("save",async function (){
-    if(!this.isModified("password")) return;
+    if(!this.isModified("password") || !this.password) return;
     this.password = await bcrypt.hash(this.password, 10);
     
 });

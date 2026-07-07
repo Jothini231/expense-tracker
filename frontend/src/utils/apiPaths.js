@@ -8,6 +8,7 @@ export const API_PATHS = {
         FORGOT_PASSWORD: "/api/v1/auth/forgot-password",
         VERIFY_OTP: "/api/v1/auth/verify-otp",
         RESET_PASSWORD: "/api/v1/auth/reset-password",
+        GOOGLE_LOGIN: "/api/v1/auth/google",
     },
 
     DASHBOARD: {

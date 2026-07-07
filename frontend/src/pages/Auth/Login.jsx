@@ -6,6 +6,7 @@ import { validateEmail } from "../../utils/helper";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { UserContext } from "../../context/UserContext";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -69,6 +70,31 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.GOOGLE_LOGIN, {
+        token: credentialResponse.credential,
+      });
+      const { token, user } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(user);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Google authentication failed. Please try again.");
+      }
+    }
+  };
+
+  const handleGoogleFailure = () => {
+    setError("Google authentication failed. Please try again.");
+  };
+
   return (
     <AuthLayout>
       <div className="flex flex-col justify-center w-full">
@@ -123,6 +149,21 @@ const Login = () => {
           <button type="submit" className="btn-primary">
             LOG IN
           </button>
+
+          <div className="flex items-center justify-center my-4">
+            <div className="border-t border-gray-300 flex-grow"></div>
+            <span className="px-3 text-gray-500 text-sm">OR</span>
+            <div className="border-t border-gray-300 flex-grow"></div>
+          </div>
+
+          <div className="flex justify-center mb-4">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleFailure}
+              useOneTap
+              text="continue_with"
+            />
+          </div>
 
           <p className="text-[13px] text-slate-800 mt-3 text-center">
             Don't have an account?{" "}
