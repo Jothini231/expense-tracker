@@ -7,7 +7,8 @@ const{
     getUserInfo,
     forgotPassword,
     verifyOTP,
-    resetPassword
+    resetPassword,
+    googleAuth
 } = require("../controllers/authController");
 const upload = require("../middleware/uploadMiddleware");
 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post("/register" , registerUser);
 router.post("/login" , loginUser);
+router.post("/google", googleAuth);
 router.get("/getUser",protect,getUserInfo);
 
 router.post("/forgot-password", forgotPassword);
