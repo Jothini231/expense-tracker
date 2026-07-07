@@ -1,6 +1,7 @@
 const xlsx = require('xlsx');
 const User = require("../models/User");
-const Expense = require("../models/Expense")
+const Expense = require("../models/Expense");
+const { GoogleGenAI } = require('@google/genai');
 
 exports.addExpense = async(req , res) => {
   const userId = req.user.id;
@@ -69,3 +70,34 @@ exports.downloadExpenseExcel = async (req, res) =>{
         res.status(500).json({message: "Server error"});
     }
 }
+
+exports.analyzeReceipt = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No receipt image provided" });
+        }
+
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [
+                'Analyze this receipt and extract the total amount, vendor name, and date. Suggest a single category strictly from this list: Food, Travel, Entertainment, Shopping, Rent, Groceries, Utilities, Health, Other. Return ONLY valid JSON in this exact structure, with no markdown formatting: {"amount": number, "vendor": "string", "date": "YYYY-MM-DD", "category": "string"}',
+                {
+                    inlineData: {
+                        data: req.file.buffer.toString("base64"),
+                        mimeType: req.file.mimetype
+                    }
+                }
+            ],
+            config: {
+                responseMimeType: "application/json",
+            }
+        });
+
+        const data = JSON.parse(response.text);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("AI Error:", error);
+        res.status(500).json({ message: "Failed to analyze receipt", error: error.message });
+    }
+};
