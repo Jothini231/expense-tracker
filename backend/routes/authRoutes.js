@@ -4,17 +4,22 @@ const { protect } = require("../middleware/authMiddleware");
 const{
     registerUser,
     loginUser,
-    getUserInfo
+    getUserInfo,
+    forgotPassword,
+    verifyOTP,
+    resetPassword
 } = require("../controllers/authController");
 const upload = require("../middleware/uploadMiddleware");
 
 const router = express.Router();
 
 router.post("/register" , registerUser);
-
 router.post("/login" , loginUser);
-
 router.get("/getUser",protect,getUserInfo);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-otp", verifyOTP);
+router.post("/reset-password", resetPassword);
 
 router.post("/upload-image",upload.single("image") , (req, res) =>{
     if(!req.file){
