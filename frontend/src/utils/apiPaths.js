@@ -5,6 +5,9 @@ export const API_PATHS = {
         LOGIN:"/api/v1/auth/login",
         REGISTER: "/api/v1/auth/register",
         GET_USER_INFO: "/api/v1/auth/getUser",
+        FORGOT_PASSWORD: "/api/v1/auth/forgot-password",
+        VERIFY_OTP: "/api/v1/auth/verify-otp",
+        RESET_PASSWORD: "/api/v1/auth/reset-password",
     },
 
     DASHBOARD: {
